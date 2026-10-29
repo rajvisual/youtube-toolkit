@@ -1,128 +1,95 @@
-# YouTube Toolkit for Windows 🚀
+# YouTube Toolkit for Windows
 
-A lightweight Windows toolkit for downloading videos, audio, and playlists with **yt-dlp** and **FFmpeg**. It uses Windows Package Manager (WinGet), so you do not need to install Python separately.
+Download videos, playlists, or audio using simple commands in Windows. This toolkit uses **yt-dlp** and **FFmpeg** and creates shortcuts so you do not need to remember long commands.
 
-## 📥 Download
+> Use this tool only for content you have permission to download. Follow the platform's terms and applicable laws.
 
-**[⬇️ Download YouTube Toolkit (ZIP)](https://github.com/rajvisual/youtube-toolkit/archive/refs/heads/main.zip)**
+## 1. Install
 
-### Quick Start
-
-1. Download the ZIP using the link above.
+1. **[Download the project ZIP](https://github.com/rajvisual/youtube-toolkit/archive/refs/heads/main.zip).**
 2. Extract the ZIP file.
-3. Open the extracted `youtube-toolkit` folder.
-4. Review `setup.bat` before running it.
-5. Right-click `setup.bat` and select **Run as administrator**.
-6. When setup finishes, open a **new** Command Prompt or PowerShell window.
+3. Open the extracted folder.
+4. Right-click `setup.bat` and choose **Run as administrator**.
+5. Approve the Windows permission prompt, then wait for setup to finish.
+6. Close and reopen Command Prompt.
 
-The installer uses WinGet to install yt-dlp and FFmpeg, creates command shortcuts in `C:\Tools`, adds that folder to your user PATH, and configures a default download location. Administrator permission is requested by the installer.
+The installer uses **WinGet** to install yt-dlp and FFmpeg. If WinGet is missing or the installation fails, see [Troubleshooting](#troubleshooting).
 
-## ✨ Features
+## 2. Download something
 
-- **No separate Python installation:** Installs yt-dlp and FFmpeg through WinGet.
-- **Best available quality:** The `dl` command requests the best available video and audio streams. Actual resolution depends on the source video.
-- **1080p option:** Use `dl1080` to cap the selected video stream at 1080p.
-- **MP4 remuxing:** Attempts to remux supported downloads into MP4 using FFmpeg.
-- **Smart default folder:** Uses `E:\DOWNLOAD` when the E: drive is available; otherwise uses your user Downloads folder under `YouTube`.
-- **Playlist downloads:** Downloads playlist items into a playlist-named folder with playlist indices in filenames.
-- **Change the download folder:** Use `setfolder` to change the configured destination.
-- **Quick updates:** Use `update` to update yt-dlp.
+Open **Command Prompt** and enter one of these commands. Replace the example URL with the link you want to use.
 
-> **Note:** MP4 remuxing changes the container when supported; it does not re-encode every video into a universally compatible codec. The available quality and formats depend on the source.
+| What you want | Command |
+|---|---|
+| Best available video quality | `dl "VIDEO_URL"` |
+| Video up to 1080p | `dl1080 "VIDEO_URL"` |
+| Audio as MP3 | `dlaudio "VIDEO_URL"` |
+| A full playlist | `dllist "PLAYLIST_URL"` |
 
-## 🖥️ Daily Commands
-
-Run these commands in a new Command Prompt or PowerShell window after setup. Replace the example URL with the actual video or playlist URL.
-
-| Command | Example | What it does |
-|---|---|---|
-| `dl` | `dl "VIDEO_URL"` | Downloads the best available video and audio streams |
-| `dl1080` | `dl1080 "VIDEO_URL"` | Downloads at up to 1080p |
-| `dlaudio` | `dlaudio "VIDEO_URL"` | Extracts audio as MP3 |
-| `dllist` | `dllist "PLAYLIST_URL"` | Downloads a playlist into a playlist-named folder |
-| `setfolder` | `setfolder "D:\Videos"` | Changes the default download folder |
-| `update` | `update` | Updates yt-dlp |
-
-### Example
+**Example**
 
 ```bat
 dl "https://www.youtube.com/watch?v=VIDEO_ID"
 ```
 
-### Check available formats
+Keep the quotation marks around the URL. The actual quality available depends on the source video.
 
-To list the formats available for a video, run:
+## 3. Where are my downloads?
+
+The installer chooses a default folder:
+
+- If your PC has an **E: drive**, downloads go to `E:\\DOWNLOAD`.
+- Otherwise, downloads go to `Downloads\\YouTube` inside your Windows user folder.
+
+To change the download folder, run:
 
 ```bat
-yt-dlp -F "VIDEO_URL"
+setfolder "D:\\Videos"
 ```
 
-### Download to a different folder for one command
+Replace `D:\\Videos` with the folder you want. The folder is created if it does not already exist.
 
-You can pass yt-dlp's `-P` option after the URL:
+## 4. Useful commands
 
-```bat
-dl "VIDEO_URL" -P "C:\Users\YourName\Desktop"
-```
+| Command | What it does |
+|---|---|
+| `dl` | Downloads the best available video and audio streams and remuxes the result to MP4 when possible. |
+| `dl1080` | Downloads at up to 1080p when that quality is available. |
+| `dlaudio` | Extracts audio as an MP3 file. |
+| `dllist` | Downloads a playlist into a folder named after the playlist. |
+| `setfolder` | Changes the default download location. |
+| `update` | Updates yt-dlp. |
 
-## 📂 Repository Structure
+## 5. Troubleshooting
 
-```text
-youtube-toolkit/
-├── setup.bat
-├── README.md
-├── LICENSE
-├── .gitignore
-├── config/
-│   └── yt-dlp.conf
-└── shortcuts/
-    ├── dl.bat
-    ├── dl1080.bat
-    ├── dlaudio.bat
-    ├── dllist.bat
-    ├── setfolder.bat
-    └── update.bat
-```
+**'dl' or another command is not recognized**
+- Close Command Prompt and open it again after installation.
+- Check that `C:\\Tools` exists and is included in your user PATH.
 
-## 🛠️ Manual Installation (Alternative)
+**WinGet is not recognized**
+- Update or install **App Installer** from Microsoft Store, then reopen Command Prompt and run `setup.bat` again.
 
-If you prefer to install the tools manually, open PowerShell and run:
+**A download fails**
+- Update yt-dlp by running `update`.
+- Check that the link works in your browser and try again.
+- Some videos may require sign-in or may not be accessible to yt-dlp.
 
-```powershell
-winget install yt-dlp.yt-dlp Gyan.FFmpeg --accept-source-agreements --accept-package-agreements
-```
+**The video is not MP4**
+- The toolkit asks yt-dlp to remux the download to MP4. Some formats or codecs may not be compatible with MP4, so the final result can depend on the source.
 
-Then create the yt-dlp configuration directory and file:
+## 6. Project files
 
-```powershell
-New-Item -ItemType Directory -Force -Path "$env:APPDATA\yt-dlp" | Out-Null
-@'
--o "E:\DOWNLOAD/%(title)s.%(ext)s"
---windows-filenames
---no-mtime
---remux-video mp4
-'@ | Set-Content -Path "$env:APPDATA\yt-dlp\config.txt" -Encoding UTF8
-```
+- `setup.bat` — installs the required tools and creates the command shortcuts.
+- `shortcuts/` — contains the shortcut command files.
+- `config/yt-dlp.conf` — contains example yt-dlp settings.
 
-This example uses `E:\DOWNLOAD`. Change the output path if you want a different folder. The manual commands above install the tools and configure yt-dlp; they do not create the toolkit's `dl`, `dl1080`, and other shortcut commands.
-
-## ❓ Troubleshooting
-
-- **Command not recognized:** Open a new terminal after setup. Check that `C:\Tools` is present in your user PATH.
-- **Download fails:** Check your internet connection and try updating yt-dlp with `update`.
-- **MP4 remuxing fails:** Confirm that FFmpeg installed correctly and is available in PATH.
-- **Downloads go to the wrong folder:** Run `setfolder "D:\Videos"` or review the yt-dlp configuration at `%APPDATA%\yt-dlp\config.txt`.
-
-## ⚖️ Responsible Use
-
-Download only content you have permission to download. Respect copyright, platform terms, and applicable laws.
-
-## 📄 License
+## License
 
 This project is released under the [MIT License](LICENSE).
 
-## 👨‍💻 Author
+## Project
 
 Created by [Raj Visual](https://github.com/rajvisual).
 
-**Repository:** [rajvisual/youtube-toolkit](https://github.com/rajvisual/youtube-toolkit)
+- **Repository:** https://github.com/rajvisual/youtube-toolkit
+- **Download ZIP:** https://github.com/rajvisual/youtube-toolkit/archive/refs/heads/main.zip
